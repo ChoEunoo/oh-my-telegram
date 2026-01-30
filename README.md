@@ -2,6 +2,8 @@
 
 > Telegram interface for OpenCode agents - Chat with Sisyphus, Oracle, and other AI agents via Telegram
 
+[![Docker](https://img.shields.io/badge/docker-ready-blue)](DOCKER.md)
+
 ## 🎯 Purpose
 
 **oh-my-telegram** bridges Telegram and OpenCode, enabling:
@@ -15,9 +17,30 @@
 
 ## 📦 Installation
 
+### Option 1: Docker (Recommended)
+
 ```bash
 # Clone repository
-git clone https://github.com/your-org/oh-my-telegram.git
+git clone https://github.com/ChoEunoo/oh-my-telegram.git
+cd oh-my-telegram
+
+# Create .env file
+cat > .env << EOF
+TELEGRAM_BOT_TOKEN=your_bot_token_here
+TELEGRAM_USER_ID=your_telegram_user_id
+EOF
+
+# Start with Docker Compose
+docker-compose up -d
+```
+
+See [DOCKER.md](DOCKER.md) for detailed Docker instructions.
+
+### Option 2: NPM
+
+```bash
+# Clone repository
+git clone https://github.com/ChoEunoo/oh-my-telegram.git
 cd oh-my-telegram
 
 # Install dependencies

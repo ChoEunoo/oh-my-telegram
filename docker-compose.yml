@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  oh-my-telegram:
+    build: .
+    image: eunoocho/oh-my-telegram:latest
+    container_name: oh-my-telegram
+    restart: unless-stopped
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_USER_ID=${TELEGRAM_USER_ID}
+      - OPENCODE_SERVER_URL=http://opencode:4096
+      - OPENCODE_DEFAULT_AGENT=sisyphus
+    volumes:
+      - opencode-sessions:/root/.opencode
+      - bot-logs:/app/logs
+    depends_on:
+      - opencode
+    networks:
+      - oh-my-network
+
+  opencode:
+    image: node:20-alpine
+    container_name: opencode-serve
+    restart: unless-stopped
+    command: >
+      sh -c "npm install -g @opencode-ai/cli &&
+             opencode serve --port 4096 --hostname 0.0.0.0"
+    volumes:
+      - opencode-sessions:/root/.opencode
+      - opencode-work:/workspace
+    networks:
+      - oh-my-network
+    ports:
+      - "4096:4096"
+
+networks:
+  oh-my-network:
+    driver: bridge
+
+volumes:
+  opencode-sessions:
+  opencode-work:
+  bot-logs:
