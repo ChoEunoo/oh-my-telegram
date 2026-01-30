@@ -107,12 +107,37 @@ ps aux | grep "opencode" | grep -v grep
 
 ## 🚀 Usage
 
+### Quick Start (Recommended)
+
+```bash
+# Start all services at once
+./start-all.sh
+
+# Stop all services
+./stop-all.sh
+
+# View logs
+tail -f /tmp/oh-my-telegram/bot.log
+```
+
+### Manual Start
+
+```bash
+# Terminal 1: opencode server
+opencode serve --port 4096
+
+# Terminal 2: opencode web (optional)
+opencode web
+
+# Terminal 3: bot
+npm start
+```
+
+### Background Start
+
 ```bash
 # Build
 npm run build
-
-# Run (foreground)
-node dist/cli.js
 
 # Run (background)
 nohup node dist/cli.js > /tmp/oh-my-telegram/bot.log 2>&1 &
