@@ -607,8 +607,8 @@ export class TelegramBot {
     console.log(`[${timestamp}] [bot] user ${userId} (agent: ${session.currentAgent}): ${messageContent.substring(0, 50)}...`);
 
     try {
-      // Send "working on it" message
-      await this.sendMessage(chatId, '⏳ 내용을 확인 중입니다... 기다려 주세요...');
+      // Send initial status message
+      await this.sendMessage(chatId, '⏳');
 
       const response = await this.executeOpenCode(
         messageContent,
