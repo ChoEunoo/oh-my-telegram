@@ -607,9 +607,6 @@ export class TelegramBot {
     console.log(`[${timestamp}] [bot] user ${userId} (agent: ${session.currentAgent}): ${messageContent.substring(0, 50)}...`);
 
     try {
-      // Send initial status message
-      await this.sendMessage(chatId, '⏳');
-
       const response = await this.executeOpenCode(
         messageContent,
         session,
