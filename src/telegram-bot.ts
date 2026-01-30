@@ -105,7 +105,13 @@ export class TelegramBot {
   }
 
   async initialize(): Promise<void> {
-    await this.gateway.initialize();
+    try {
+      await this.gateway.initialize();
+      console.log('[TelegramBot] Gateway initialized successfully');
+    } catch (error) {
+      console.error('[TelegramBot] Failed to initialize gateway:', error);
+      throw new Error(`Failed to connect to opencode server: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   /**
@@ -236,7 +242,14 @@ export class TelegramBot {
     session: TelegramSession,
     agent?: string
   ): Promise<string> {
-    return this.gateway.sendMessage(message);
+    try {
+      return await this.gateway.sendMessage(message);
+    } catch (error: any) {
+      if (error instanceof Error && error.message.includes('ECONNREFUSED')) {
+        throw new Error('Cannot connect to opencode server. Is it running?');
+      }
+      throw error;
+    }
   }
 
   /**
