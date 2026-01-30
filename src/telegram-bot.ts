@@ -126,20 +126,43 @@ export class TelegramBot {
 
   /**
    * Send message to Telegram chat
+   * Returns the API response containing message_id
    */
-  async sendMessage(chatId: number, text: string, options: any = {}): Promise<void> {
+  async sendMessage(chatId: number, text: string, options: any = {}): Promise<any> {
     const timestamp = new Date().toISOString();
     try {
-      await this.apiCall('sendMessage', {
+      const response = await this.apiCall('sendMessage', {
         chat_id: chatId,
         text,
         parse_mode: 'Markdown',
         ...options,
       });
       console.log(`[${timestamp}] [bot] sent message to ${chatId} (${text.length} chars)`);
+      return response;
     } catch (error: any) {
       console.error(`[${timestamp}] [bot] failed to send message:`, error.response?.data || error.message);
       throw error;
+    }
+  }
+
+  /**
+   * Edit existing message text
+   */
+  async editMessageText(chatId: number, messageId: number, text: string, options: any = {}): Promise<void> {
+    const timestamp = new Date().toISOString();
+    try {
+      await this.apiCall('editMessageText', {
+        chat_id: chatId,
+        message_id: messageId,
+        text,
+        parse_mode: 'Markdown',
+        ...options,
+      });
+      console.log(`[${timestamp}] [bot] edited message ${messageId} in ${chatId} (${text.length} chars)`);
+    } catch (error: any) {
+      console.error(`[${timestamp}] [bot] failed to edit message:`, error.response?.data || error.message);
+      // If edit fails (message too old), send new message instead
+      await this.sendMessage(chatId, text, options);
     }
   }
 
@@ -607,6 +630,8 @@ export class TelegramBot {
     console.log(`[${timestamp}] [bot] user ${userId} (agent: ${session.currentAgent}): ${messageContent.substring(0, 50)}...`);
 
     try {
+      const loadingResult = await this.sendMessage(chatId, '⏳ 처리 중...');
+
       const response = await this.executeOpenCode(
         messageContent,
         session,
@@ -615,8 +640,13 @@ export class TelegramBot {
 
       const chunks = this.chunkMessage(response);
 
-      for (const chunk of chunks) {
-        await this.sendMessage(chatId, chunk);
+      if (chunks.length === 1) {
+        await this.editMessageText(chatId, loadingResult.result.message_id, chunks[0]);
+      } else {
+        await this.editMessageText(chatId, loadingResult.result.message_id, chunks[0]);
+        for (let i = 1; i < chunks.length; i++) {
+          await this.sendMessage(chatId, chunks[i]);
+        }
       }
 
       console.log(`[${timestamp}] [bot] response sent (${chunks.length} chunks, ${response.length} chars)`);
