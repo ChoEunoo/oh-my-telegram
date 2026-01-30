@@ -664,6 +664,11 @@ export class TelegramBot {
           for (const update of response.result) {
             if (!this.isRunning) break;
             await this.processUpdate(update);
+            
+            // Send welcome message to new users
+            if (update.message && !this.sessions.has(update.message.chat.id)) {
+              await this.handleStart(update.message.chat.id);
+            }
           }
         }
       } catch (error: any) {
